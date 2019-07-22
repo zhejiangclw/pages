@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://file.shangjinuu.com/cssjs/vue-2.6.10.min.js"></script>
+    <style>
+        .login-wrap{
+            width: 300px;
+            height: 300px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 20px 4px #eee;
+            margin: 0 auto;
+            padding: 25px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .phone-item{
+            display: grid;
+            grid-template-columns: 30% 70%;
+            margin-bottom: 20px;
+            height: 40px;
+            align-items: center;
+        }
+        .phone-item .phone{
+            height: 40px;
+        }
+        .phone-item input{
+            outline: none;
+            border: 1px solid skyblue;
+            height: 40px;
+        }
+        .phone-item.code-item input{
+            min-width: 1px;
+            flex: 1;
+            height: 40px;
+        }
+        .phone-item.code-item .code{
+            display: flex;
+            align-items: center;
+        }
+        .phone-item .btn-code{
+            border: 0;
+            background: skyblue;
+            padding: 5px 20px;
+            color: #fff;
+            border-radius: 16px;
+            outline: none;
+        }
+        .btn-item{
+            display: flex;
+            justify-content: center;
+        }
+        .btn-item .btn-login{
+            border: 0;
+            background: skyblue;
+            padding: 5px 20px;
+            color: #fff;
+            border-radius: 16px;
+            outline: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 登录窗 -->
+    <div class="login-wrap">
+        <div class="phone-item">
+            <div class="txt">手机号：</div>
+            <div class="phone">
+                <input v-model.trim="phone" type="text" id="phone">
+            </div>
+        </div>
+        <div class="phone-item code-item">
+            <div class="txt">验证码：</div>
+            <div class="phone code">
+                <input v-model.trim="code" type="text" id="code">
+                <button class="btn-code" @click="sendCode">{{yzmText}}</button>
+            </div>
+        </div>
+        <div class="btn-item">
+            <button class="btn-login">登录</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            phone: '',
+            code: '',
+            timer: null,
+            yzmText: '获取验证码',
+            sendingCode: false
+        },
+        methods:{
+            sendCode() {
+                if (!checkPhone(this.phone)) {
+                    return console.log('phone错误')
+                }
+                // 调用接口，回调成功后调用changeYzmText方法
+                if (this.sendingCode) {
+                    return
+                }
+                this.sendingCode = true;
+                this.changeYzmText()
+            },
+            // 短信倒计时
+            changeYzmText(){
+                let num = 60;
+                this.timer = setInterval(()=> {
+                    num --;
+                    this.yzmText = num + 's';
+                    if (num == 0) {
+                        this.yzmText = "获取验证码";
+                        this.sendingCode = false;
+                        clearInterval(this.timer);
+                        this.timer = null;
+                    }
+                },1000)
+            },
+            login() {
+                if (!checkPhone(this.phone)) {
+                    return console.log('phone错误')
+                }
+                if (!checkCode(this.code)) {
+                    return console.log('code错误')
+                }
+                // 调用登录接口
+                console.log('调用登录接口')
+            }
+        }
+
+    });
+    /**
+     * @desc 校验手机号
+     * @param val：手机号
+     * */
+    function checkPhone(val) {
+        if (!(/^1[345789]\d{9}$/.test(val))) {
+            return false
+        } else {
+            return true
+        }
+    }
+    /**
+     * @desc 校验验证码方法
+     * @param val：验证码的值
+     * @param  num：4为4位数的验证码，6为6位数的验证码
+     * */
+    function checkCode(val, num) {
+        if (num == 4) {
+            if (!(/^\d{6}$/.test(val))) {
+                return false
+            } else {
+                return true
+            }
+        } else if (num == 6){
+            if (!(/^\d{4}$/.test(val))) {
+                return false
+            } else {
+                return true
+            }
+        }
+
+    }
+</script>
+</body>
+</html>
