@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上下左右居中的几种方式</title>
+</head>
+<body>
+<!-- 方式1-flex -->
+<style>
+    #box1{
+        height: 100px;
+        width: 100px;
+        display: flex;
+        background: #8dc63f;
+        align-items: center;
+        justify-content: center;
+    }
+    #box1 .box1-box{
+        width: 20px;
+        height: 20px;
+        background: #39b54a;
+    }
+</style>
+<div id="box1">
+    <div class="box1-box"></div>
+</div>
+
+<!-- 方式2-grid -->
+<style>
+    #box2{
+        height: 100px;
+        width: 100px;
+        display: grid;
+        background: #f37b1d;
+        justify-items: center;
+        align-items: center;
+    }
+    #box2 .box2-box{
+        width: 20px;
+        height: 20px;
+        background: #fbbd08;
+    }
+</style>
+<div id="box2">
+    <div class="box2-box"></div>
+</div>
+
+<!-- 方式3-transform -->
+<style>
+    #box3{
+        height: 100px;
+        width: 100px;
+        position: relative;
+        background: #1cbbb4;
+    }
+    #box3 .box3-box{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        background: #0081ff;
+    }
+</style>
+<div id="box3">
+    <div class="box3-box"></div>
+</div>
+
+<!-- 方式4-calc -->
+<style>
+    #box4{
+        height: 100px;
+        width: 100px;
+        position: relative;
+        background: #6739b6;
+    }
+    #box4 .box4-box{
+        position: absolute;
+        top: calc(50% - 10px);
+        left: calc(50% - 10px);
+        width: 20px;
+        height: 20px;
+        background: #9c26b0;
+    }
+</style>
+<div id="box4">
+    <div class="box4-box"></div>
+</div>
+
+<!-- 方式5-行内元素 -->
+<style>
+    #box5{
+        height: 100px;
+        width: 100px;
+        text-align: center;
+        line-height: 100px;
+        background: #a5673f;
+    }
+    #box5 .box5-box{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: #8799a3;
+    }
+</style>
+<div id="box5">
+    <div class="box5-box"></div>
+</div>
+</body>
+</html>
