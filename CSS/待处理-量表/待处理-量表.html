@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://file.shangjinuu.com/cssjs/vue-2.6.10.min.js"></script>
+    <style>
+        .chart1{
+            position: relative;
+            background: #fff;
+            width: 370px;
+            height: 240px;
+            display: grid;
+            grid-template-columns: 1fr 2.5fr 1fr 1fr 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr 1fr ;
+            grid-gap: 2px;
+        }
+        .chart1 .li{
+            background: rgb(209,246,244);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .chart1 .li.colume{
+            grid-column-start: 1;
+            grid-column-end: 1;
+            grid-row-start: 2;
+            grid-row-end: 4;
+            background:  rgb(209,246,244);
+            writing-mode: vertical-lr;/*从左向右 从右向左是 writing-mode: vertical-rl;*/
+            writing-mode: tb-lr;/*IE浏览器的从左向右 从右向左是 writing-mode: tb-rl；*/
+        }
+        .chart1 .li.colume2{
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 4;
+            grid-row-end: 6;
+            background: rgb(209,246,244);
+            writing-mode: vertical-lr;/*从左向右 从右向左是 writing-mode: vertical-rl;*/
+            writing-mode: tb-lr;/*IE浏览器的从左向右 从右向左是 writing-mode: tb-rl；*/
+        }
+        .chart1 .li.zfx{
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 2;
+            grid-row-end: 4;
+            background: rgb(237,247,249);
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .chart1 .li.zfx2{
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 4;
+            grid-row-end: 6;
+            background: rgb(237,247,249);
+            flex-direction: column;
+            justify-content: space-around;
+        }
+        .chart1 .li.color20{
+            background: rgb(185,221,219);
+        }
+        .chart1 .li.color40{
+            background: rgb(149,205,202);
+        }
+        .chart1 .li.color60{
+            background: rgb(118,189,185);
+        }
+        .chart1 .li.color80{
+            background: rgb(97,179,174);
+        }
+        .chart1 .li.color100{
+            background: rgb(70,169,163);
+        }
+        .chart1-wrap .score{
+            width: 20px;
+            height: 20px;
+            background: rgb(26,118,113);
+            position: absolute;
+            z-index: 2;
+            top: 60px;
+            left: 185px;
+        }
+        .chart1-wrap .score:after,.chart1-wrap .score:before{
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid #387671;
+            position: absolute;
+            top: 0px;
+            left: -10px;
+        }
+        .chart1-wrap .score:before {
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: none;
+            border-left: 10px solid #387671;
+            position: absolute;
+            top: 0px;
+            left: 20px;
+        }
+        .chart1-wrap{
+            position: relative;
+        }
+
+        .chart4-wrap .part1,  .chart4-wrap .part2{
+            position: relative;
+        }
+        .chart4-wrap .part1:after{
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -10px;
+            left: -4.5px;
+            border-bottom: 10px solid #387671;
+            transform: rotate(134deg);
+        }
+
+        .chart5-wrap{
+            position: relative;
+            margin-left: 50px;
+            margin-top: 202px;
+        }
+        .chart5-wrap .colume{
+            width: 4px;
+            height: 120px;
+            background: pink;
+            position: relative;
+        }
+        .chart5-wrap .row{
+            width: 120px;
+            height: 4px;
+            background: pink;
+            position: relative;
+        }
+        .chart5-wrap .colume:after,.chart5-wrap .row:after{
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -10px;
+            left: -6.5px;
+            border-bottom: 10px solid pink;
+            transform: rotate(134deg);
+        }
+        .chart5-wrap .row:after{
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -10px;
+            left: 110px;
+            border-bottom: 10px solid pink;
+            transform: rotate(316deg);
+        }
+        .chart5-wrap .colume .value-list{
+            height: 100px;
+            /* width: 20px; */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: absolute;
+            bottom: 8px;
+            left: -32px;
+            text-align: right;
+            font-size: 12px;
+        }
+        .chart5-wrap .love .score{
+            width: 20px;
+            height: 20px;
+            background: pink;
+            position: absolute;
+            top: -30px;
+            left: 10px;
+            border-radius: 50%;
+            font-size: 10px;
+            color: #fff;
+            line-height: 20px;
+            text-align: center;
+        }
+        .chart5-wrap .love{
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            display: flex;
+        }
+        .chart5-wrap .love:after{
+            content: '恋爱观';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 100%;
+            font-size: 10px;
+        }
+        .chart5-wrap .love .left{
+            width: 20px;
+            height: 70px;
+            background: #ffa7b7;
+        }
+        .chart5-wrap .love .right{
+            width: 20px;
+            height: 70px;
+            background: pink;
+        }
+
+        .chart4-wrap:after{
+            content: '123213';
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 表1 -->
+    <div class="chart1-wrap">
+        <div class="score">20</div>
+        <div class="chart1">
+            <div class="li colume">人际认知</div>
+            <div class="li colume2">人际能力</div>
+            <div class="li zfx">
+                <span>沟通认知</span>
+                <span>心理理论</span>
+            </div>
+            <div class="li zfx2">
+                <span>社会问题 <br> 解决能力</span>
+                <span>沟通能力</span>
+            </div>
+            <div class="li"></div>
+            <div class="li">方面</div>
+            <div class="li">20</div>
+            <div class="li">40</div>
+            <div class="li">60</div>
+            <div class="li">80</div>
+            <div class="li">100</div>
+            <div class="li color20"></div>
+            <div class="li color40"></div>
+            <div class="li color60"></div>
+            <div class="li color80"></div>
+            <div class="li color100"></div>
+            <div class="li color20"></div>
+            <div class="li color40"></div>
+            <div class="li color60"></div>
+            <div class="li color80"></div>
+            <div class="li color100"></div>
+            <div class="li color20"></div>
+            <div class="li color40"></div>
+            <div class="li color60"></div>
+            <div class="li color80"></div>
+            <div class="li color100"></div>
+            <div class="li color20"></div>
+            <div class="li color40"></div>
+            <div class="li color60"></div>
+            <div class="li color80"></div>
+            <div class="li color100"></div>
+
+        </div>
+    </div>
+
+    <!-- 表2 -->
+    <div class="chart2-wrap" >
+        <canvas id="demo" width="250px" height="300px"></canvas>
+    </div>
+
+    <!-- 飞机 -->
+    <div class="chart3-wrap">
+        <canvas id="feiji" width="250px" height="300px"></canvas>
+    </div>
+    <div class="feiji-wrap" style="position: relative;">
+        <div class="chart4-wrap" style="width: 200px;height: 300px;background:linear-gradient(red 50%, blue 50%, blue 80%,gray 80%, gray 100%);">
+        </div>
+        <div class="box" style="position:absolute; top: 0; left: 0;width: 200px;height: 300px;background-image: url('1222.png');-webkit-background-size: 100% 100%;background-size: 100% 100%;">
+        </div>
+    </div>
+
+    <!-- 表4 -->
+    <div class="chart4-wrap" style="position: relative;margin-left: 200px;">
+        <div class="jiantou" style="display: flex;    position: absolute;
+    top: -40px;
+    left: 40px;">
+            <div class="left">
+                <div class="part1" style="width: 5px;height: 100px; background:green;" ></div>
+                <div class="part2" style="width: 5px;height: 100px; background:#18ff3b;border-bottom-left-radius: 4px;"></div>
+            </div>
+            <div class="left right" style="transform: rotateY(180deg)">
+                <div class="part1" style="width: 5px;height: 100px; background:#cfefcf;" ></div>
+                <div class="part2" style="width: 5px;height: 100px; background:rgb(60, 206, 82);border-bottom-left-radius: 4px;"></div>
+            </div>
+        </div>
+        <div class="jiantou" style="display: flex;position:absolute;top: -36px;left: 40px;transform: rotate(90deg)">
+            <div class="left">
+                <div class="part1" style="width: 5px;height: 100px; background:#cfefd0;" ></div>
+                <div class="part2" style="width: 5px;height: 100px; background:rgb(59, 128, 6);border-bottom-left-radius: 6px;"></div>
+            </div>
+            <div class="left right" style="transform: rotateY(180deg)">
+                <div class="part1" style="width: 5px;height: 100px; background:rgb(99, 207, 83);" ></div>
+                <div class="part2" style="width: 5px;height: 100px; background:rgb(121, 251, 64);border-bottom-left-radius: 6px;"></div>
+            </div>
+        </div>
+        <div class="area" style="    display: grid;
+    grid-template-rows: 80px 80px;
+    grid-template-columns: 80px 80px;
+    position: absolute;
+    top: -16px;
+    left: -35px;">
+            <div class="area1" style="    width: 80px;
+    height: 80px;
+    background: #3b8006;"></div>
+            <div class="area1" style="    width: 80px;
+    height: 80px;
+    background: rgb(207, 239, 209);"></div>
+            <div class="area1" style="    width: 80px;
+    height: 80px;
+    background: rgb(121, 251, 64);"></div>
+            <div class="area1" style="    width: 80px;
+    height: 80px;
+    background: rgb(99, 207, 83);;"></div>
+        </div>
+    </div>
+
+    <!-- 表5 -->
+    <div class="chart5-wrap">
+        <div class="zb">
+            <div class="colume">
+                <div class="value-list">
+                    <div class="li">100</div>
+                    <div class="li">50</div>
+                    <div class="li">0</div>
+                </div>
+            </div>
+            <div class="row">
+
+            </div>
+            <div class="love">
+                <div class="left"></div>
+                <div class="left right"></div>
+                <div class="score">70</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+          x0: 0,
+          y0: 0,
+          x1: 0,
+          y1: 0
+        },
+        mounted() {
+
+
+            this.setChart3WrapCanvas()
+        },
+        methods: {
+            setChart3WrapCanvas() {
+                var canvas = document.getElementById('feiji');
+                var ctx = canvas.getContext('2d');
+                var grd;
+                ctx.beginPath();
+                ctx.moveTo(125,0);
+                ctx.quadraticCurveTo(50,75,50,175)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(50,175);
+                ctx.quadraticCurveTo(0,250,75,300)
+                ctx.stroke()
+
+                ctx.beginPath();
+                ctx.moveTo(75,300);
+                ctx.quadraticCurveTo(87,295,90,290)
+                ctx.stroke()
+
+                ctx.beginPath();
+                ctx.moveTo(90,290);
+                ctx.bezierCurveTo(95,250, 100,300, 105,297)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(105,297)
+                ctx.quadraticCurveTo(107,300, 125,300)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(125,0);
+                ctx.quadraticCurveTo(200,75,200,175)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(200,175);
+                ctx.quadraticCurveTo(250,250,175,300)
+                ctx.stroke()
+
+                ctx.beginPath();
+                ctx.moveTo(175,300);
+                ctx.quadraticCurveTo(163,295,160,290)
+                ctx.stroke()
+
+                ctx.beginPath();
+                ctx.moveTo(160,290);
+                ctx.bezierCurveTo(155,250, 150,300, 145,297)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(145,297)
+                ctx.quadraticCurveTo(143,300, 125,300)
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(75,75)
+                ctx.lineTo(175, 75)
+                ctx.fillStyle = '#873221';
+                ctx.fill()
+                ctx.stroke()
+
+                ctx.translate(125,125)
+                ctx.lineWidth = 11;
+                ctx.beginPath();
+                var linear = ctx.createLinearGradient(100,100,200,100);
+                linear.addColorStop(0,'#000');
+                linear.addColorStop(0.5,'#000');
+                linear.addColorStop(1,'#000');
+                ctx.strokeStyle = linear;
+                ctx.arc(0,0,30,0,360*Math.PI/180);
+                ctx.stroke()
+                // context.bezierCurveTo(208, 164, 255, 207, 412, 271);
+                // context.lineTo(427, 271);
+                // context.quadraticCurveTo(470, 296, 541, 300);
+                // context.closePath();
+                // grd = context.createLinearGradient(304, 246, 345, 155);
+                // grd.addColorStop(0, "#000E91"); //类似立体效果
+                // grd.addColorStop(1, "#495AFE"); //
+                // context.fillStyle = grd;
+                // context.fill();
+                // context.lineWidth = 4;
+                // context.stroke();
+
+
+
+                /*context.beginPath();
+                context.linejoin = "round";
+                context.moveTo(248, 60);
+                context.lineTo(262, 45);
+                context.lineTo(285, 56);
+                context.lineTo(284, 59);
+                context.lineTo(276, 91);
+                context.closePath();
+                context.fillStyle = "#495AFE";
+                context.fill();
+                context.lineWidth = 4;
+                context.stroke(); ///沿着当前路径绘制或画一条直线。
+
+                // right tail wing detail飞机尾部右翼 详细
+                context.beginPath();
+                context.moveTo(281, 54); // 10
+                context.lineTo(273, 84); // 9
+                context.closePath();
+                context.lineWidth = 2;
+                context.stroke();
+                ////飞机前部 右翼
+                context.beginPath();
+                context.moveTo(425, 159);
+                context.lineTo(449, 91);
+                context.lineTo(447, 83);
+                context.lineTo(408, 67);
+                context.lineTo(343, 132);
+                context.fillStyle = "#495AFE";
+                context.fill();
+                context.closePath();
+                context.lineWidth = 4;
+                context.stroke();*/
+            },
+        }
+
+    })
+</script>
+</body>
+</html>

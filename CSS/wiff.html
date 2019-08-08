@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <canvas style="margin: 100px;border: 1px solid;"  width="500" height="500" id="canvas">
+
+    </canvas>
+    <script>
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        ctx.translate(200,200);
+
+        drawH(ctx,20,30,'#ffc26b','#ff9a5f','#ff8157', 3, 2);
+        // drawH(ctx,30,60,'#ff7b68','#ff6f3e','#ff4027', 5);
+        // drawH(ctx,60,190,'#ffb9cc','#ff87b9','#ff157c',6);
+        // drawH(ctx,190,201,'#f8d2ff','#f27eff','#ff24f2',8);
+        // drawH(ctx,201,250,'#d6c8ff','#a790ff','#5d37ff',3);
+        // drawH(ctx,250,300,'#b9f3ff','#4fe6ff','#1ddfff',4);
+        // drawH(ctx,300,360,'#c4ffc4','#86ff9c','#18ff3b',5);
+        // ctx.lineWidth = 20;
+        // ctx.arc(200,200,10,0,360*Math.PI/180);
+        // ctx.stroke();
+        // ctx.lineWidth = 11;
+        // ctx.beginPath();
+        // var linear = ctx.createLinearGradient(100,100,200,100);
+        // linear.addColorStop(0,'#ffc26b');
+        // linear.addColorStop(0.5,'#ff9a5f');
+        // linear.addColorStop(1,'#ff8157');
+        // ctx.strokeStyle = linear;
+        // ctx.arc(0,0,30,0,30*Math.PI/180);
+        // ctx.stroke();
+        // ctx.beginPath();
+        // ctx.arc(0,0,50,0,30*Math.PI/180);
+        // ctx.stroke();
+        // ctx.beginPath();
+        // ctx.arc(0,0,70,0,30*Math.PI/180);
+        // ctx.stroke();
+        // ctx.beginPath();
+        // ctx.arc(0,0,90,0,30*Math.PI/180);
+        // ctx.stroke();
+
+
+
+
+
+        // ctx.arc(0,0,10,0,30*Math.PI/180);
+        // ctx.fillStyle="#0000ff";
+        // ctx.arc(0,0,30,0,30*Math.PI/180);
+        // ctx.arc(0,0,50,0,30*Math.PI/180);
+        // ctx.arc(0,0,70,0,30*Math.PI/180);
+        // ctx.arc(0,0,90,0,30*Math.PI/180);
+        // ctx.restore();
+        // ctx.stroke();
+        var circleValue = {
+                x : 150,
+                y : 120,
+                radius : 86,
+                startAngle : 0,
+                endAngle : 2 * Math.PI,
+                anticlockwise : false
+            };
+
+        // drowArc(ctx,0.8);
+        function drowArc(ctx,percent){
+
+            //打底 圆环 绘制
+            ctx.lineWidth = 11;
+            ctx.beginPath();
+            var grd = ctx.createRadialGradient(circleValue.x, circleValue.y, 72, circleValue.x, circleValue.y, 93);
+            grd.addColorStop(0,"#e9eae9");
+            grd.addColorStop("0.8","#fefefe");
+            grd.addColorStop("1","#e9eae9");
+            ctx.strokeStyle = grd;
+            ctx.arc(circleValue.x, circleValue.y, circleValue.radius, circleValue.startAngle, circleValue.endAngle, circleValue.anticlockwise);
+            ctx.closePath();
+            ctx.stroke();
+
+            //展示进度圆环绘制
+            ctx.lineWidth = 11;
+            ctx.beginPath();
+            var linear = ctx.createLinearGradient(100,100,200,100);
+            linear.addColorStop(0,'#ffc26b');
+            linear.addColorStop(0.5,'#ff9a5f');
+            linear.addColorStop(1,'#ff8157');
+            ctx.strokeStyle = linear;
+            ctx.arc(circleValue.x, circleValue.y, circleValue.radius, circleValue.startAngle, circleValue.endAngle*percent, circleValue.anticlockwise);
+            ctx.stroke();
+
+            //进度起点圆角
+            ctx.beginPath();
+            ctx.fillStyle = '#ff8157';
+            ctx.arc(circleValue.x + circleValue.radius, circleValue.y - 1, 5.5, circleValue.startAngle, circleValue.endAngle, circleValue.anticlockwise);
+            ctx.closePath();
+            ctx.fill();
+
+            //终点圆角
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#ff7854';
+            ctx.fillStyle = '#ff7854';
+            ctx.strokeStyle = '#fff';
+            //计算终点的坐标
+            var getX = circleValue.x + circleValue.radius * Math.cos(2 * percent * Math.PI),
+                getY = circleValue.y + circleValue.radius * Math.sin(2 * percent * Math.PI);
+            ctx.arc(getX , getY, 9, circleValue.startAngle, circleValue.endAngle, circleValue.anticlockwise);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawH(ctx,start,end,color1,color2,color3,num, type) {
+            ctx.lineWidth = 11;
+            ctx.beginPath();
+            var linear = ctx.createLinearGradient(100,100,200,100);
+            linear.addColorStop(0,color1);
+            linear.addColorStop(0.5,color2);
+            linear.addColorStop(1,color3);
+            ctx.strokeStyle = linear;
+            for(let n=0; n<num ; n++) {
+                ctx.arc(0,0,n*20+10,start*Math.PI/180,end*Math.PI/180);
+                ctx.stroke();
+                ctx.beginPath();
+            }
+
+
+            // ctx.lineWidth = 10;
+            let jiaodu =0;
+            if (type==1) {
+                jiaodu = (360-end+start)/2+start;
+            } else {
+                jiaodu = (end-start)/2+start;
+            }
+
+            let m = Math.PI/180
+            let xj = Math.cos(jiaodu*m)*200*(num/8);
+            let yj = Math.sin(jiaodu*m)*200*(num/8)
+            console.log(xj,yj)
+            ctx.beginPath();
+            ctx.lineWidth = 1 ;
+            ctx.strokeStyle = '#fff';
+            ctx.arc(xj,yj,15,0,360*Math.PI/180);
+            ctx.fillStyle = color2;
+            ctx.fill()
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.fillStyle = '#fff';
+            ctx.font= 'bold 10px Microsoft Yahei';
+            ctx.textAlign='center';
+            ctx.textBaseline='middle';
+            ctx.fillText('10',xj, yj);
+
+            ctx.beginPath();
+            ctx.fillStyle = color2;
+            ctx.font='bold 14px Microsoft Yahei';
+            ctx.fillText('认知', xj+20, yj+20);
+            ctx.stroke()
+
+
+            // ctx.arc(0,0,50,start*Math.PI/180,end*Math.PI/180);
+            // ctx.stroke();
+            // ctx.beginPath();
+            // ctx.arc(0,0,70,start*Math.PI/180,end*Math.PI/180);
+            // ctx.stroke();
+            // ctx.beginPath();
+            // ctx.arc(0,0,90,start*Math.PI/180,end*Math.PI/180);
+            // ctx.stroke();
+        }
+    </script>
+</body>
+</html>

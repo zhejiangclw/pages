@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>扇形</title>
+</head>
+<body>
+<div class="sector"></div>
+<style>
+    .sector{
+        border-radius:80px 0 0;
+        width: 80px;
+        height: 80px;
+        background: #666;
+    }
+</style>
+
+<div class="shanxing shanxing1">
+    <div class="sx1"></div>
+    <div class="sx2"></div>
+</div>
+<div class="shanxing shanxing2">
+    <div class="sx1"></div>
+    <div class="sx2"></div>
+    <div class="sx1 sx3"></div>
+</div>
+<style>
+    .shanxing{
+        position: relative;
+        width: 200px;
+        height: 200px;
+        border-radius: 100px;
+        background-color: #8dc63f;
+    }
+    .shanxing1 .sx1,.shanxing1 .sx2{
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        transform: rotate(0deg);
+        clip: rect(0px,100px,200px,0px); /*这个clip属性用来绘制半圆，在clip的rect范围内的内容显示出来，使用clip属性，元素必须是absolute的 */
+        border-radius: 100px;
+        background-color: #39b54a;
+        /*-webkit-animation: an1 2s infinite linear; */
+    }
+    .shanxing1 .sx2{
+        transform: rotate(100deg);
+    }
+
+    .shanxing2{
+        position: relative;
+        width: 200px;
+        height: 200px;
+        border-radius: 100px;
+        background-color: #8dc63f;
+    }
+    .shanxing2 .sx1,.shanxing2 .sx2{
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        transform: rotate(0deg);
+        clip: rect(0px,100px,200px,0px); /*这个clip属性用来绘制半圆，在clip的rect范围内的内容显示出来，使用clip属性，元素必须是absolute的 */
+        border-radius: 100px;
+        /*background-color: #39b54a;*/
+        background-color: #fff;
+        /*-webkit-animation: an1 2s infinite linear; */
+    }
+    .shanxing2 .sx2{
+        transform: rotate(100deg);
+    }
+    .shanxing2 .sx3{
+        transform: rotate(-30deg);
+    }
+</style>
+</body>
+</html>
