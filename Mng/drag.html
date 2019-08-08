@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+
+        #diagramContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        .node{
+            position: absolute;
+        }
+
+
+
+        .handle-list {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 9000;
+            background-color: rgba(194, 194, 194, 0.6);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .tips-list{
+            display: flex;
+            float: right;
+        }
+        .tips-list .li{
+            padding: 0 5px;
+        }
+        .tips-list .li .dot{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+
+        .panel {
+            width: 300px;
+            /*margin-bottom: 20px;*/
+            background-color: #fff;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            background-color: rgba(0, 0, 0, .075);
+            border: 1px solid transparent;
+            border-color: #bce8f1;
+            -moz-box-shadow: 4px 5px 18px #70685C;
+            -webkit-box-shadow: 4px 5px 18px #70685C;
+            box-shadow: 4px 5px 18px #70685C;
+        }
+        .panel .panel-heading {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            padding: 10px 15px;
+            border-bottom: 1px solid transparent;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            cursor: move;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel .panel-heading i:nth-child(2) {
+            flex: 1;
+        }
+        .panel .list-group .li{
+            position: relative;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: -1px;
+            background-color: #fff;
+            padding: 10px 10px;
+            border: 1px solid transparent;
+            border-color: #bce8f1;
+            cursor: move;
+
+            display: flex;
+            justify-content: space-between;
+        }
+        .panel .list-group .li .txt{
+            flex: 1;
+        }
+
+    </style>
+
+    <style>
+        .jtk-endpoint-anchor-init {
+            background: gray;
+        }
+        .jtk-endpoint-anchor-end {
+            background: red;
+        }
+        .jtk-endpoint-anchor-primary {
+            background: rgb(97, 183, 207);;
+        }
+        .jtk-endpoint-anchor-warning {
+            background: rgb(230, 162, 60);;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <div class="handle-list">
+        <el-button type="warning" circle icon="el-icon-remove-outline" @click="scale(-0.3)"></el-button>
+        <el-button type="success" circle icon="el-icon-circle-plus-outline" @click="scale(+0.3)"></el-button>
+        <el-button type="danger" circle icon="el-icon-refresh"></el-button>
+        <el-button type="info" circle icon="el-icon-news"></el-button>
+        <el-button type="primary" circle icon="el-icon-plus" @click="addNodeModel"></el-button>
+        <el-select v-model="value" placeholder="请选择" >
+            <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+            </el-option>
+        </el-select>
+        <div class="tips-list clearfix">
+            <div class="li" v-for="item in tipsList">
+                <div class="dot" :style="{ background: item.color }"></div>
+                <div class="txt">{{item.txt}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="diagramContainer">
+        <div v-for="(item, index) in menuList" :id="'menu-' + item.id" class="node">
+            <div class="panel">
+                <div class="panel-heading">
+                    <i class="el-icon-location"></i>
+                    <span @click="editNodeModel(item)" style="cursor: pointer">{{item.title}}</span>
+                    <i class="el-icon-plus" style="cursor: pointer;" @click="openChildNodeModel(item)"></i>
+                </div>
+                <div class="list-group" v-for="(li, index) in item.group">
+                    <div :id="'li-' + item.id + '-' + li.id" class="li">
+                        <div class="txt">{{li.title}}</div>
+                        <div style="display: flex;">
+                            <div class="edit" @click="editChildNodeModel(li)" style="cursor: pointer;"><i class="el-icon-edit-outline"></i></div>
+                            <div class="add"><i class="el-icon-plus"></i></div>
+                            <div class="linkMove"><i class="el-icon-caret-right"></i></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Node Model-->
+    <el-dialog title="新增大节点" :visible.sync="dialogNodeVisible">
+        <el-form>
+            <el-form-item label="节点id" :label-width="nodeLabelWidth">
+                <el-input v-model="node.id" disabled placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item label="节点标题" :label-width="nodeLabelWidth">
+                <el-input v-model="node.title" placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item label="端点类型" :label-width="nodeLabelWidth">
+                <el-select v-model="node.endPointColor" placeholder="请选择端点类型">
+                    <el-option v-for="item in tipsList" :label="item.txt" :value="item.color"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogNodeVisible = false">取 消</el-button>
+            <el-button type="primary" @click="nodeModelType=='add'? addNode(): editNode()">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <!--ChildNode Model-->
+    <el-dialog title="新增小节点" :visible.sync="dialogChildNodeVisible">
+        <el-form>
+            <el-form-item label="节点id" :label-width="childNodeLabelWidth">
+                <el-input v-model="childNode.id" disabled placeholder="请输入id"></el-input>
+            </el-form-item>
+            <el-form-item label="节点标题" :label-width="childNodeLabelWidth">
+                <el-input v-model="childNode.title" placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item label="端点类型" :label-width="childNodeLabelWidth">
+                <el-select v-model="childNode.endPointColor" placeholder="请选择端点类型">
+                    <el-option v-for="item in tipsList" :label="item.txt" :value="item.color"></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogChildNodeVisible = false">取 消</el-button>
+            <el-button type="primary" @click="childNodeModelType=='add'?addChildNode() : editChildNode()">确 定</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<!-- 先引入 Vue -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+<script src="https://cdn.bootcss.com/jsPlumb/2.9.3/js/jsplumb.min.js"></script>
+<script>
+    // https://blog.csdn.net/coder_zyz/article/details/78980885
+    // https://www.cnblogs.com/mq0036/p/7942139.html
+    // https://github.com/jsplumb/jsplumb/blob/master/src/jsplumb.js
+    // https://wdd.js.org/jsplumb-chinese-tutorial/#/?id=_213-%E7%BB%99%E9%93%BE%E6%8E%A5%E6%B7%BB%E5%8A%A0%E7%82%B9%E5%87%BB%E4%BA%8B%E4%BB%B6%EF%BC%9A%E7%82%B9%E5%87%BB%E5%88%A0%E9%99%A4%E8%BF%9E%E7%BA%BF
+    // 创建一个端点有3种方法，
+    // 第一种是jsPlumb.connect()
+    // 第二种是jsPlumb.addEndpoint(),此方法有回调
+    // 第三种是jsPlumb.makeSource()
+    // 端点的类型有4种：
+    // Dot: 可带3个参数
+    var jsPlumbBaseConfig = {
+        // 端点类型：Dot:点，Rectangle：正方形
+        endpoint: ['Dot', { radius: 8, fill: '#61B7CF'}],
+        // 连接线的颜色，大小样式
+        connectorStyle: {
+            stroke: '#61B7CF',
+            strokeWidth: 3,
+        },
+        // 鼠标移动到连接线时的颜色和大小
+        connectorHoverStyle: {
+            stroke: 'red',
+            strokeWidth: 5,
+        },
+        // 端点的颜色样式
+        paintStyle: {
+            stroke: '#61B7CF',
+            fill: '#61B7CF',
+            radius: 6,
+            lineWidth: 2
+        },
+        // 鼠标移动到端点时的颜色和大小
+        hoverPaintStyle: {
+            stroke: 'red',
+            fill: 'red',
+        },
+        // 是否作为连线起点
+        isSource: true,
+        // 是否作为连线终点
+        isTarget: true,
+        // 连接线的样式种类有[Bezier],[Flowchart],[StateMachine ],[Straight ]
+        connector: ['Bezier', { gap: 10, cornerRadius: 5, alwaysRespectStubs: true }],
+        // 设置连接点最多可以连接几条线
+        maxConnections: -1,
+        // 删除连线不会删除节点
+        deleteEndpointsOnDetach: false,
+        // 鼠标不能删除连线
+        ConnectionsDetachable: false,
+
+        connectorOverlays: [
+            ['Arrow', {
+                width: 10,
+                length: 10,
+                location: .5
+            }]
+        ]
+
+    };
+    var vm = new Vue({
+        el: '#app',
+        data(){
+            return {
+                // 初始放大参数
+                scaleVal: 1,
+                // 基础配置参数
+                jsPlumbBaseConfig: {},
+
+                // 拖拽图选择
+                options: [],
+                value: '2',
+
+                // 节点标识
+                tipsList: [
+                    {
+                        value: 'init',
+                        color: 'gray',
+                        txt: '初始节点'
+                    },{
+                        value: 'end',
+                        color: 'red',
+                        txt: '结束节点'
+                    }, {
+                        value: 'default',
+                        color: '#61B7CF',
+                        txt: '正常节点'
+                    },{
+                        value: 'warn',
+                        color: '#e6a23c',
+                        txt: '错误节点'
+                    }
+                ],
+
+                // 节点列表
+                menuList: [],
+
+                // 节点模态框参数
+                dialogNodeVisible: false,
+                nodeModelType: 'add',
+                nodeLabelWidth: '120px',
+                node: {
+                    index: 0,
+                    id: '',
+                    title: '',
+                    group: [],
+                    left: 0,
+                    top: 0,
+                    endPointColor: '#61B7CF',
+                },
+
+                // 子节点模态框参数
+                dialogChildNodeVisible: false,
+                childNodeModelType: 'add',
+                childNodeLabelWidth: '120px',
+                childNode: {
+                    parentId: '',
+                    parentIndex: 0,
+                    id: '201905310001',
+                    title: '',
+                    endPointColor: '#61B7CF',
+                },
+
+                hoverClass: { // 支持endPoint,connector,anchor,overlay
+                    cssClass: '',
+                    hoverClass: ''
+                }
+            }
+        },
+        methods: {
+            // 放大缩小
+            scale(val) {
+                this.scaleVal += val;
+                $("#diagramContainer").css({
+                    "-webkit-transform": "scale(" + this.scaleVal + ")",
+                    "-moz-transform": "scale(" + this.scaleVal + ")",
+                    "-ms-transform": "scale(" + this.scaleVal + ")",
+                    "-o-transform": "scale(" + this.scaleVal + ")",
+                    "transform": "scale(" + this.scaleVal + ")",
+                    "-webkit-transform-origin": "50% 50%",
+                    "-moz-transform-origin": "50% 50%",
+                    "-ms-transform-origin": "50% 50%",
+                    "-o-transform-origin": "50% 50%",
+                    "transform-origin": "50% 50%",
+                });
+            },
+            // 视图定位
+            locationTo(id) {
+                var div = document.getElementById('menu-' + id);
+                var top = div.offsetTop - window.innerHeight / 2 + div.clientHeight / 2;
+                var left = div.offsetLeft - window.innerWidth / 2 + div.clientWidth / 2;
+                $('html,body').animate({scrollTop: top * this.scaleVal, scrollLeft: left * this.scaleVal}, 800);
+            },
+            // 获取所有数据
+            getData() {
+                let options = [
+                    {
+                        value: '1',
+                        label: '莱蒙水榭'
+                    }, {
+                        value: '2',
+                        label: '青山雾雨'
+                    }, {
+                        value: '3',
+                        label: '琉璃梦境'
+                    }, {
+                        value: '4',
+                        label: '云海阑珊'
+                    }, {
+                        value: '5',
+                        label: '听雨楼阁'
+                    }
+                ];
+                let menuList = [
+                    {
+                        index: 0,
+                        id: '201905300001',
+                        title: '初始节点',
+                        left: 9,
+                        top: 246,
+                        endPointColor: 'gray',
+                        group: [
+                            {
+                                parentIndex: 0,
+                                id: '201906010001',
+                                parentId: '201905310001',
+                                targetId: '201906010002',
+                                title: '初始事件',
+                                endPointColor: '#61B7CF',
+                            }
+                        ]
+                    },
+                    {
+                        index: 1,
+                        id: '201905310002',
+                        title: '正常节点',
+                        left: 347,
+                        top: 248,
+                        endPointColor: '#61B7CF',
+                        group: [
+                            {
+                                parentIndex: 1,
+                                id: '201906010002',
+                                parentId: '201905310002',
+                                targetId: '201905310003',
+                                title: '正常事件1',
+                                endPointColor: '#61B7CF',
+                            },
+                            {
+                                parentIndex: 1,
+                                id: '201906010003',
+                                parentId: '201905310002',
+                                targetId: '201905310003',
+                                title: '正常事件2',
+                                endPointColor: '#61B7CF',
+                            },
+                            {
+                                parentIndex: 1,
+                                id: '201906010004',
+                                parentId: '201905310002',
+                                targetId: '201905310003',
+                                title: '正常事件3',
+                                endPointColor: '#61B7CF',
+                            }
+                        ]
+                    },
+                    {
+                        index: 3,
+                        id: '201905310003',
+                        title: '终止节点',
+                        left: 750,
+                        top: 245,
+                        endPointColor: 'red',
+                        group: [
+                            {
+                                parentIndex: 3,
+                                id: '201906010005',
+                                parentId: '201905310003',
+                                targetId: '',
+                                title: '终止事件1',
+                                endPointColor: 'red',
+                            }
+                        ]
+                    }
+                ];
+
+                this.options = options;
+                // this.menuList = menuList;
+                this.jsPlumbInit();
+            },
+            jsPlumbInit() {
+                let me = this;
+                jsPlumb.ready(function () {
+
+                    // 更新节点：
+                    // jsPlumb.setIdChanged(oldId,newId)
+                    // 使节点可拖拽
+                    // jsPlumb.draggable(id)
+                    // 重绘，每次使用连线时，都会导致相关联的元素重绘，但当加载大量数据时，可以使用：
+                    // jsPlumb.setSuspendDrawing(true);
+                    // jsPlumb.setSuspendDrawing(false,true);
+                    // 全局默认配置和连线默认配置
+                    // 如果是全局则可以使用jsPlumb.importDefaults({···})，
+                    // 也可以在实例化时，重新定义jsPlumb.getInstance({···})，
+                    // Anchor : "BottomCenter",//端点的定位点的位置声明（锚点）：left，top，bottom等
+                    // Anchors : [ null, null ],//多个锚点的位置声明
+                    // ConnectionsDetachable   : true,//连接是否可以使用鼠标默认分离
+                    // ConnectionOverlays  : [],//附加到每个连接的默认重叠
+                    // Connector : "Bezier",//要使用的默认连接器的类型：折线，流程等
+                    // Container : null,//设置父级的元素，一个容器
+                    // DoNotThrowErrors  : false,//如果请求不存在的Anchor，Endpoint或Connector，是否会抛出
+                    // DragOptions : { },//用于配置拖拽元素的参数
+                    // DropOptions : { },//用于配置元素的drop行为的参数
+                    // Endpoint : "Dot",//端点（锚点）的样式声明（Dot）
+                    // Endpoints : [ null, null ],//多个端点的样式声明（Dot）
+                    // EndpointOverlays : [ ],//端点的重叠
+                    // EndpointStyle : { fill : "#456" },//端点的css样式声明
+                    // EndpointStyles : [ null, null ],//同上
+                    // EndpointHoverStyle : null,//鼠标经过样式
+                    // EndpointHoverStyles : [ null, null ],//同上
+                    // HoverPaintStyle : null,//鼠标经过线的样式
+                    // LabelStyle : { color : "black" },／／标签的默认样式。
+                    // LogEnabled : false,//是否打开jsPlumb的内部日志记录
+                    // Overlays : [ ],//重叠
+                    // MaxConnections : 1,//最大连接数
+                    // PaintStyle : { lineWidth : 8, stroke : "#456" },//连线样式
+                    // ReattachConnections : false,//是否重新连接使用鼠标分离的线
+                    // RenderMode : "svg",//默认渲染模式
+                    // Scope : "jsPlumb_DefaultScope"//范围，标识
+                    // 当需要对修改过后的元素重新计算端点和连接线时，则可以使用
+                    // jsPlumb.repaint(el,[ui])
+                    // 初始化
+                    var jspInstance = jsPlumb.getInstance(me.baseConfig);
+
+                    // 限制拖拽区域
+                    jsPlumb.setContainer('diagramContainer');
+
+                    // 绑定事件-连线时启动
+                    jsPlumb.bind("connection",function(info){
+                        console.log(info);
+                        // 子节点连接自身父节点，取消连接
+                        if (info.targetId == info.sourceId.split('-')[1]) {
+                            return fasle
+                        } else {
+                            this.menuList[info.sourceId.split('-')[1]].group[info.sourceId.split('-')[2]].targetId = info.target;
+                        }
+
+                    });
+                    // 绑定事件-删除连线时启动
+                    jsPlumb.bind("connectionDetached",function(info,originalEvent){
+                        console.log(info);
+                        console.log(originalEvent);
+                    });
+                    jsPlumb.bind("endpoint",function(info,originalEvent){
+                        console.log(info);
+                        console.log(originalEvent);
+                    });
+
+
+
+                    me.menuList.length > 0 && me.menuList.forEach((v, i) => {
+                        // 父节点：拖拽
+                        me.draggable('menu-'+v.id);
+                        jsPlumb.connect()
+                    })
+
+
+                })
+            },
+            // 界面放大缩小功能
+
+            // 保存功能
+
+            // 新增节点功能（弹窗界面新增）
+            addNodeModel() {
+                this.nodeModelType = 'add';
+                this.node.index = this.menuList.length>0 && Number(this.menuList[this.menuList.length-1].index)+1 || 0;
+                this.node.id = this.menuList.length>0 && String(Number(this.menuList[this.menuList.length-1].id)+1) || '201905310001';
+                this.dialogNodeVisible = true;
+            },
+            editNodeModel(item) {
+                this.nodeModelType = 'edit';
+                this.node = item;
+                this.dialogNodeVisible = true;
+            },
+            addNode() {
+                let node = JSON.parse(JSON.stringify(this.node));
+                this.menuList.push(node);
+                setTimeout(() => {
+                    this.addEndPoint('LeftMiddle', 'menu-'+node.id, node.endPointColor);
+                    this.draggable('menu-'+node.id);
+                },100);
+                this.dialogNodeVisible = false;
+                this.node = {
+                    index: 0,
+                    id: '',
+                    title: '',
+                    group: [],
+                    left: 0,
+                    top: 0,
+                    endPointColor: '#61B7CF',
+                }
+            },
+            editNode() {
+                let node = JSON.parse(JSON.stringify(this.node));
+                jsPlumb.setIdChanged(node.id)
+                this.dialogNodeVisible = false;
+                this.node = {
+                    index: 0,
+                    id: '',
+                    title: '',
+                    group: [],
+                    left: 0,
+                    top: 0,
+                    endPointColor: '#61B7CF',
+                }
+            },
+            // 节点新增子节点功能
+            openChildNodeModel(item) {
+                this.childNodeModelType = 'add';
+                this.childNode.parentId = item.id;
+                this.childNode.parentIndex = item.index;
+                this.childNode.id = item.group.length? String(Number(item.group[item.group.length-1].id)+1): '201906010001';
+                this.dialogChildNodeVisible = true;
+            },
+            editChildNodeModel(li) {
+                this.childNodeModelType = 'edit';
+                this.childNode = li;
+                this.dialogChildNodeVisible = true;
+            },
+            addChildNode() {
+                let childNode = JSON.parse(JSON.stringify(this.childNode));
+                this.menuList[this.childNode.parentIndex].group.push(childNode);
+                setTimeout(() => {
+                    this.addEndPoint('RightMiddle', 'li-'+childNode.parentId+'-'+childNode.id, childNode.endPointColor);
+                },100);
+                this.dialogChildNodeVisible = false;
+                this.childNode = {
+                    parentId: '',
+                    parentIndex: 0,
+                    id: '',
+                    title: '',
+                    endPointColor: '#61B7CF',
+                }
+            },
+            editChildNode() {
+                let childNode = JSON.parse(JSON.stringify(this.childNode));
+                jsPlumb.setIdChanged(childNode.id)
+                this.dialogChildNodeVisible = false;
+                this.childNode = {
+                    parentId: '',
+                    parentIndex: 0,
+                    id: '',
+                    title: '',
+                    endPointColor: '#61B7CF',
+                }
+            },
+
+            // 节点定位到下一个节点功能
+
+            // 修改本节点内容功能
+
+            // 修改本节点中子节点内容功能
+
+
+            // 增加节点端点功能(要求能自定义位置，颜色，单联还是多联
+            addEndPoint(type, id, color) {
+                jsPlumb.addEndpoint(id, {
+                    anchors: [type],
+                    paintStyle: {
+                        fill: color
+                    },
+                    isSource: type=='RightMiddle'? true: false,
+                    isTarget: type=='LeftMiddle'? true: false,
+                    maxConnections: -1,
+                });
+
+                jsPlumb.bind('click', function (conn, originalEvent) {
+                    if (window.prompt('确定删除所点击的链接吗？ 输入1确定') === '1') {
+                        jsPlumb.detach(conn)
+                    }
+                })
+            },
+
+            // 链接节点功能
+
+            // 使节点可拖拽化功能
+            draggable(id) {
+                console.log(id)
+                jsPlumb.draggable(id, {containment: 'parent'});
+            },
+
+            // 加端点
+            addPoint(id, pointList) {
+                // pointList格式：
+                // [ ["LeftMiddle", { shape:"Triangle" } ] ]
+                pointList = [
+                    ['LeftMiddle'],
+                    ['RightMiddle']
+                ]
+                jsPlumb.addEndpoint(id, {
+                    anchors: pointList,
+                    // endpointStyle: { fill: "red" },
+                    paintStyle: {
+                        stroke: 'green',
+                        fill: 'blue',
+                        radius: 6,
+                        lineWidth: 2
+                    }
+                }, this.baseConfig);
+
+            },
+
+            // 链接节点(初始化时用）
+            connect(sourceId, targetId) {
+                jsPlumb.connect({
+                    source: sourceId,
+                    target: targetId
+                })
+            },
+
+            makeSource() {
+
+            },
+            makeTarget() {
+
+            }
+        },
+        mounted() {
+            let me = this;
+            this.getData();
+
+            this.jsPlumbBaseConfig = jsPlumbBaseConfig
+
+        }
+    });
+
+
+
+    /* global jsPlumb */
+    function f() {
+        jsPlumb.ready(function () {
+            // 很多连线都是相同设置的情况下，可以将配置抽离出来，作为一个单独的变量，作为connect的第二个参数传入。
+            // 实际上connect的第二个参数会和第一个参数merge，作为一个整体。
+            let common = {
+                endpoint: 'Rectangle', // 端点类型，形状，Dot：圆点； Rectangle：正方形；
+                connector: ['Straight'], // 链接线的形状，Bezier: 贝塞尔曲线；Flowchart: 具有90度转折点的流程线；StateMachine: 状态机；Straight: 直线
+                paintStyle: { // 给连线设置不同的颜色，设置不同的粗细之类的。
+                    stroke: '#0bbb1b',
+                    fill: 'white',
+                    strokeWidth: 3
+                },
+                hoverPaintStyle: {
+                    strokeWidth: 4
+                },
+                connectorStyle: {
+                    stroke: '#6739b6',
+                    strokeWidth: 3
+                },
+                connectorHoverStyle: {
+                    strokeWidth: 4
+                },
+                endpointStyle: { // 给连线设置不同的颜色，设置不同的粗细之类的。
+                    fill: '#0081ff',
+                    outlineWidth: 2
+                },
+                endpointHoverStyle: {
+                    fill: '#0081ff',
+                    strokeWidth: 4
+                },
+
+                // 箭头实际上是通过设置overlays去设置的，可以设置箭头的长宽以及箭头的位置，
+                // location 0.5表示箭头位于中间，location 1表示箭头设置在连线末端。 一根连线是可以添加多个箭头的。
+                // overlays也是一个比较重要的概念，overlays可以理解为遮罩层。遮罩层不仅仅可以设置箭头，也可以设置其他内容。
+                // overlays有五种类型,
+                // Arrow：一个可配置的箭头；
+                // Label：标签，可以在链接上显示文字信息；
+                // PlainArrow：原始类型的箭头；
+                // Diamond：菱形箭头
+                // Custom：自定义类型
+                // 官方文档：http://jsplumb.github.io/jsplumb/overlays.html#type-arrow
+                // id是用来通过removeOverlay(id)来移除该样式的，比如connection.removeOverlay("label");
+                // overlays: [ ['Arrow', { width: 12, length: 12, location: .9 }] ], // 箭头
+                // overlays: [ "Arrow", ["Label", { label:"foo", location: .25, id:"myLabel" }] ], // 箭头加文字，location可设置0-1或者1-max或者负整数
+                // overlays: [ ["Label", { label:"foo", id:"label", location:-30  }] ]
+
+                isSource: true,
+                isTarget: true,
+
+
+
+            };
+            var connection = jsPlumb.connect({
+                // source: 'item_left', // 连线源的标识，可以是id, element, 或者Endpoint
+                // target: 'item_right', // 连线目标的标识，可以是id, element, 或者Endpoint
+            }, common);
+
+            // 限制拖拽区域
+            jsPlumb.setContainer('diagramContainer')
+
+            jsPlumb.draggable('item_left',{containment: 'parent', grid: [10, 10]});
+            jsPlumb.draggable('item_right', {containment: 'parent', grid: [10, 10]});
+            jsPlumb.draggable('item_bottom', {containment: 'parent', grid: [10, 10]});
+
+            // 增加端点
+            // jsPlumb.addEndpoint('item_right', {
+            //     anchors: ['Left', 'Right']
+            // });
+            jsPlumb.addEndpoint('item_left', {
+                anchors: ['Right']
+            }, common)
+
+            jsPlumb.addEndpoint('item_right', {
+                anchor: 'Left'
+            }, common)
+
+            jsPlumb.addEndpoint('item_right', {
+                anchor: 'Right'
+            }, common)
+
+
+
+        })
+    }
+
+</script>
+</body>
+</html>

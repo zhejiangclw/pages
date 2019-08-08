@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        #diagramContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        .node{
+            position: absolute;
+        }
+       /* #diagramContainer {
+            padding: 20px;
+            width: 80%;
+            height: 400px;
+            border: 1px solid gray;
+            position: relative;
+        }
+        .item{
+            position: absolute;
+            height: 40px;
+            width: 138px;
+            border: 1px solid #8dc63f;
+            border-radius: 8px;
+            background: #8dc63f;
+            box-shadow: 5px 4px 7px #39b54a;
+        }*/
+
+
+
+        .handle-list {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            z-index: 9000;
+            background-color: rgba(194, 194, 194, 0.6);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .tips-list{
+            display: flex;
+            float: right;
+        }
+        .tips-list .li{
+            padding: 0 5px;
+        }
+        .tips-list .li .dot{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+
+        .panel {
+            width: 300px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 4px;
+            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            background-color: rgba(0, 0, 0, .075);
+            border: 1px solid transparent;
+            border-color: #bce8f1;
+            -moz-box-shadow: 4px 5px 18px #70685C;
+            -webkit-box-shadow: 4px 5px 18px #70685C;
+            box-shadow: 4px 5px 18px #70685C;
+        }
+        .panel .panel-heading {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+            padding: 10px 15px;
+            border-bottom: 1px solid transparent;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            cursor: move;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel .panel-heading i:nth-child(2) {
+            flex: 1;
+        }
+        .panel .list-group .li{
+            position: relative;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: -1px;
+            background-color: #fff;
+            padding: 10px 10px;
+            border: 1px solid transparent;
+            border-color: #bce8f1;
+            cursor: move;
+
+            display: flex;
+        }
+
+    </style>
+
+    <style>
+        .jtk-endpoint-anchor-init {
+            background: gray;
+        }
+        .jtk-endpoint-anchor-end {
+            background: red;
+        }
+        .jtk-endpoint-anchor-primary {
+            background: rgb(97, 183, 207);;
+        }
+        .jtk-endpoint-anchor-warning {
+            background: rgb(230, 162, 60);;
+        }
+    </style>
+
+    <style>
+        .ticket-link {
+            position: relative;
+            width: 26.042vw;
+            height: 100%;
+            background: #f9568a;
+            cursor: pointer;
+            color: #fff;
+            overflow: hidden;
+        }
+        .ticket-link:before{
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%,-50%) scale(.8);
+            transform: translate(-50%,-50%) scale(.8);
+            width: 300px;
+            height: 200px;
+            background: url('1d4799cf9409f634a858c4d4fb9f48f9.png') -300px 0/1500px 1200px no-repeat;
+            -webkit-animation: keyframes-flash 1.2s steps(1) infinite forwards;
+            animation: keyframes-flash 1.2s steps(1) infinite forwards;
+            background-image: url('1d4799cf9409f634a858c4d4fb9f48f9.png');
+            background-position: 0 1200px;
+            background-repeat: no-repeat;
+        }
+        .flex-jc-ct{
+            display: flex;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+        h4{
+            font-size: 1.25vw;
+            letter-spacing: .25vw;
+            margin-bottom: .469vw;
+        }
+        p{
+             font-size: .729vw;
+        }
+
+        .ticket{
+            background: #000;
+            width: 300px;
+            height: 200px;
+            /*background: url('1d4799cf9409f634a858c4d4fb9f48f9.png') -300px 0/1500px 1200px no-repeat;*/
+            -webkit-animation: keyframes-flash 1.2s steps(1) infinite forwards;
+            animation: keyframes-flash 1.2s steps(1) infinite forwards;
+            background-image: url('1d4799cf9409f634a858c4d4fb9f48f9.png');
+            background-size: 1500px 1200px;
+            background-position: -300px 0px;
+            background-repeat: no-repeat;
+        }
+        /*@keyframes keyframes-flash {*/
+        /*    0% {*/
+        /*        background-position: -900px -600px;*/
+        /*    }*/
+        /*    10%{*/
+        /*        background-position:  -45px -202px;*/
+        /*    }*/
+        /*    20% {*/
+        /*        background-position: -224px -257px;*/
+        /*    }*/
+        /*    30%{*/
+        /*        background-position: -560px -250px;*/
+        /*    }*/
+        /*    40% {*/
+        /*        background-position: -545px -897px;*/
+        /*    }*/
+        /*    50%{*/
+        /*        background-position: 0 -400px;*/
+        /*    }*/
+        /*    60% {*/
+        /*        background-position: -900px -600px;*/
+        /*    }*/
+        /*    70%{*/
+        /*        background-position:  -45px -202px;*/
+        /*    }*/
+        /*    80% {*/
+        /*        background-position: -224px -257px;*/
+        /*    }*/
+        /*    90%{*/
+        /*        background-position: -560px -250px;*/
+        /*    }*/
+        /*    100% {*/
+        /*        background-position: -545px -897px;*/
+        /*    }*/
+        /*}*/
+        /*@keyframes keyframes-flash {
+            0% {
+                background-position: -300px -400px;
+            }
+            10%{
+                background-position: -600px -400px;
+            }
+            20% {
+                background-position: -900px -400px;
+            }
+            30%{
+                background-position: -1200px -400px;
+            }
+            40% {
+                background-position: -1500px -400px;
+            }
+            50%{
+                background-position: 0 -400px;
+            }
+            60% {
+                background-position: -300px -800px;
+            }
+            70%{
+                background-position: -600px -800px;
+            }
+            80% {
+                background-position: -900px -800px;
+            }
+            90%{
+                background-position: -1200px -800px;
+            }
+            100% {
+                background-position: -1500px -800px;
+            }
+        }*/
+        @keyframes keyframes-flash{
+            0%{width:300px;height:200px;background-image:url(//activity.hdslb.com/blackboard/activity13065/1d4799cf9409f634a858c4d4fb9f48f9.png);
+                background-position:-300px 0;background-size:1500px 1200px}
+            3.33%{background-position:-900px -600px}
+            6.67%{background-position:0 -200px}
+            10.00%{background-position:-300px -200px}
+            13.33%{background-position:0 -400px}
+            16.67%{background-position:-300px -400px}
+            20.00%{background-position:-600px 0}
+            23.33%{background-position:-600px -200px}
+            26.67%{background-position:-600px -400px}
+            30.00%{background-position:0 -600px}
+            33.33%{background-position:-300px -600px}
+            36.67%{background-position:-600px -600px}
+            40.00%{background-position:-900px 0}
+            43.33%{background-position:-900px -200px}
+            46.67%{background-position:-900px -400px}
+            50.00%{background-position:0 0}
+            53.33%{background-position:0 -800px}
+            56.67%{background-position:-300px -800px}
+            60.00%{background-position:-600px -800px}
+            63.33%{background-position:-900px -800px}
+            66.67%{background-position:0 -1000px}
+            70.00%{background-position:-300px -1000px}
+            73.33%{background-position:-600px -1000px}
+            76.67%{background-position:-900px -1000px}
+            80.00%{background-position:-1200px 0}
+            83.33%{background-position:-1200px -200px}
+            86.67%{background-position:-1200px -400px}
+            90.00%{background-position:-1200px -600px}
+            93.33%{background-position:-1200px -800px}
+            96.67%,
+            to{background-position:-1200px -1000px}
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <a class="flex-column flex-jc-ct flex-ai-ct ticket-link" href="javascript: void(0);"><h4>收藏购票页</h4><p>06月28日 20:00开放预购</p></a>
+</div>
+<div class="ticket">
+
+</div>
+<!--<div id="diagramContainer">
+    <div id="item_left" class="item" ></div>
+    <div id="item_right" class="item" style="left: 200px;"></div>
+    <div id="item_bottom" class="item" style="top: 150px;"></div>
+</div>-->
+<!-- 先引入 Vue -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+<script src="https://cdn.bootcss.com/jsPlumb/2.9.3/js/jsplumb.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data(){
+            return {
+                options: [],
+                value: '2',
+
+                tipsList: [
+                    {
+                        color: 'gray',
+                        txt: '初始节点'
+                    },{
+                        color: 'red',
+                        txt: '结束节点'
+                    }, {
+                        color: 'rgb(97, 183, 207)',
+                        txt: '正常节点'
+                    },{
+                        color: '#e6a23c',
+                        txt: '错误节点'
+                    }
+                ],
+
+                menuList: [
+                    {
+                        id: '201905300001',
+                        title: '初始量表-开始',
+                        // pointList: [ ['LeftMiddle'] ],
+                        group: [
+                            {
+                                id: '201905309999',
+                                txt: '这是开始的文案'
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        methods: {
+
+        },
+        mounted() {
+
+        }
+    })
+
+
+</script>
+</body>
+</html>
